@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="Ticker.Loader">
+<Description>
+Загрузчик. Описание API Информационно-статистического сервера Московской Биржи 
+http://www.moex.com/a2193 и http://fs.moex.com/files/6523</Description>
+<Abstract>1</Abstract>
+<TimeCreated>64495,70547.718468</TimeCreated>
+
+<Method name="Populate">
+<Description>
+Загрузить информацию о тикерах начиная с From и заканчивая To. Purge - удалить все записи перед началом загрузки
+Write $System.Status.GetErrorText(##class(Ticker.Loader).Populate()</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>From:%Date(DISPLAY=3)="2013-03-25",To:%Date(DISPLAY=3)={$ZDate($Horolog,3)},Purge:%Boolean=$$$YES</FormalSpec>
+<Implementation><![CDATA[
+	#Dim Status As %Status = $$$OK
+	Set FromH = $ZDateH(From, 3)
+	Set ToH = $ZDateH(To, 3)
+	
+	Do:Purge ..Purge()
+	
+	For DateH = FromH:1:ToH {
+		Write $c(13), "Populating ", $ZDate(DateH, 3)
+		Set Status = ..PopulateDay(DateH)
+		Quit:$$$ISERR(Status)
+	}
+	
+	Quit Status
+]]></Implementation>
+</Method>
+
+<Method name="PopulateDay">
+<Description>
+Write $System.Status.GetErrorText(##class(Ticker.Loader).PopulateDay(63907))</Description>
+<ClassMethod>1</ClassMethod>
+<FormalSpec>DateH:%Date</FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#Dim Status As %Status = $$$OK
+		
+	Set Reader = ##class(%XML.Reader).%New()
+	Set Date = $ZDate(DateH, 3)
+	Set Count = 0
+	
+	While Count '= $G(CountOld) {
+		Set CountOld = Count
+		Set Status = Reader.OpenURL(..GetURL(Date, Count)) // ,, ..GetRequest(Date))
+		Quit:$$$ISERR(Status)
+		
+		Do Reader.Correlate("row", "Ticker.Data")
+		While Reader.Next(.Object, .Status) {
+			#Dim Object As Ticker.Data
+			
+			If Object.Ticker '="" {
+				Set Status = Object.%Save()
+				Quit:$$$ISERR(Status)
+				Set Count = Count + 1
+			}
+		}
+		Quit:(Count-CountOld)<100
+	}
+	Quit Status
+]]></Implementation>
+</Method>
+
+<Method name="GetURL">
+<ClassMethod>1</ClassMethod>
+<CodeMode>expression</CodeMode>
+<FormalSpec>Date,Start:%Integer=0</FormalSpec>
+<Implementation><![CDATA[$$$FormatText("http://iss.moex.com/iss/history/engines/stock/markets/shares/boards/tqbr/securities.xml?date=%1&start=%2", Date, Start)
+]]></Implementation>
+</Method>
+
+<Method name="Purge">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[	Do ##class(Ticker.Data).%KillExtent()
+]]></Implementation>
+</Method>
+
+<Method name="Test">
+<Description>
+w $System.Status.GetErrorText(##class(Ticker.Loader).Test())</Description>
+<ClassMethod>1</ClassMethod>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#Dim Status As %Status = $$$OK
+
+	Set Reader = ##class(%XML.Reader).%New()
+	
+	Set Data = ..GetTestData()
+	Set Status =  Reader.OpenString(Data)
+	Quit:$$$ISERR(Status) Status
+	
+	Do Reader.Correlate("row", "Ticker.Data")
+	While Reader.Next(.Object, .Status) {
+		Zw Object
+		Write $System.Status.GetErrorText(Status)
+	}
+	
+	Quit Status
+]]></Implementation>
+</Method>
+
+<Method name="GetTestData">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	Set XData = ##class(%Dictionary.XDataDefinition).IDKEYOpen($classname(), "TestData")
+	Set Data = XData.Data.Read($$$MaxStringLength)
+	Set Data = $ZCVT(Data, "O", "UTF8")
+	Quit Data
+]]></Implementation>
+</Method>
+
+<XData name="TestData">
+<Data><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+<data id="history">
+<metadata>
+<columns>
+<column name="BOARDID" type="string" bytes="12" max_size="0" />
+<column name="TRADEDATE" type="date" bytes="10" max_size="0" />
+<column name="SHORTNAME" type="string" bytes="189" max_size="0" />
+<column name="SECID" type="string" bytes="36" max_size="0" />
+<column name="NUMTRADES" type="double" />
+<column name="VALUE" type="double" />
+<column name="OPEN" type="double" />
+<column name="LOW" type="double" />
+<column name="HIGH" type="double" />
+<column name="LEGALCLOSEPRICE" type="double" />
+<column name="WAPRICE" type="double" />
+<column name="CLOSE" type="double" />
+<column name="VOLUME" type="double" />
+<column name="MARKETPRICE2" type="double" />
+<column name="MARKETPRICE3" type="double" />
+<column name="ADMITTEDQUOTE" type="double" />
+<column name="MP2VALTRD" type="double" />
+<column name="MARKETPRICE3TRADESVALUE" type="double" />
+<column name="ADMITTEDVALUE" type="double" />
+<column name="WAVAL" type="double" />
+</columns>
+</metadata>
+<rows>
+<row BOARDID="TQBR" TRADEDATE="2015-12-21" SHORTNAME="Якутскэн-п" SECID="YKENP" NUMTRADES="5" VALUE="27200" OPEN="0.271" LOW="0.27" HIGH="0.28" LEGALCLOSEPRICE="0.28" WAPRICE="0.272" CLOSE="0.28" VOLUME="100000" MARKETPRICE2="" MARKETPRICE3="0.276" ADMITTEDQUOTE="" MP2VALTRD="0" MARKETPRICE3TRADESVALUE="501410" ADMITTEDVALUE="0" WAVAL="" />
+<row BOARDID="TQBR" TRADEDATE="2015-12-21" SHORTNAME="Yandex clA" SECID="YNDX" NUMTRADES="1193" VALUE="31123503.1" OPEN="1085" LOW="1070.2" HIGH="1103.8" LEGALCLOSEPRICE="1095.1" WAPRICE="1090.4" CLOSE="1095.1" VOLUME="28543" MARKETPRICE2="1090.4" MARKETPRICE3="1090.4" ADMITTEDQUOTE="1090.4" MP2VALTRD="31123503.1" MARKETPRICE3TRADESVALUE="31123503.1" ADMITTEDVALUE="31123503.1" WAVAL="" />
+<row BOARDID="TQBR" TRADEDATE="2015-12-21" SHORTNAME="ТНСэнЯр" SECID="YRSB" NUMTRADES="0" VALUE="0" OPEN="" LOW="" HIGH="" LEGALCLOSEPRICE="116" WAPRICE="" CLOSE="" VOLUME="0" MARKETPRICE2="" MARKETPRICE3="98.2" ADMITTEDQUOTE="" MP2VALTRD="0" MARKETPRICE3TRADESVALUE="500590" ADMITTEDVALUE="0" WAVAL="" />
+<row BOARDID="TQBR" TRADEDATE="2015-12-21" SHORTNAME="ТНСэнЯр-п" SECID="YRSBP" NUMTRADES="0" VALUE="0" OPEN="" LOW="" HIGH="" LEGALCLOSEPRICE="78.6" WAPRICE="" CLOSE="" VOLUME="0" MARKETPRICE2="" MARKETPRICE3="79.5" ADMITTEDQUOTE="" MP2VALTRD="0" MARKETPRICE3TRADESVALUE="9121770" ADMITTEDVALUE="0" WAVAL="" />
+<row BOARDID="TQBR" TRADEDATE="2015-12-21" SHORTNAME="БанкВВБ ао" SECID="YRSL" NUMTRADES="0" VALUE="0" OPEN="" LOW="" HIGH="" LEGALCLOSEPRICE="162" WAPRICE="" CLOSE="" VOLUME="0" MARKETPRICE2="" MARKETPRICE3="184.5" ADMITTEDQUOTE="" MP2VALTRD="0" MARKETPRICE3TRADESVALUE="500095" ADMITTEDVALUE="0" WAVAL="" />
+<row BOARDID="TQBR" TRADEDATE="2015-12-21" SHORTNAME="Живой Оф" SECID="ZHIV" NUMTRADES="10" VALUE="32790" OPEN="26.5" LOW="25.9" HIGH="26.5" LEGALCLOSEPRICE="26.4" WAPRICE="26" CLOSE="26.4" VOLUME="1260" MARKETPRICE2="" MARKETPRICE3="29.1" ADMITTEDQUOTE="" MP2VALTRD="0" MARKETPRICE3TRADESVALUE="500097" ADMITTEDVALUE="0" WAVAL="" />
+<row BOARDID="TQBR" TRADEDATE="2015-12-21" SHORTNAME="ЗИЛ ао" SECID="ZILL" NUMTRADES="3" VALUE="35210" OPEN="320" LOW="320" HIGH="321" LEGALCLOSEPRICE="321" WAPRICE="320" CLOSE="321" VOLUME="110" MARKETPRICE2="" MARKETPRICE3="339" ADMITTEDQUOTE="" MP2VALTRD="0" MARKETPRICE3TRADESVALUE="518730" ADMITTEDVALUE="0" WAVAL="" />
+<row BOARDID="TQBR" TRADEDATE="2015-12-21" SHORTNAME="ЗМЗ-ао" SECID="ZMZN" NUMTRADES="0" VALUE="0" OPEN="" LOW="" HIGH="" LEGALCLOSEPRICE="33" WAPRICE="" CLOSE="" VOLUME="0" MARKETPRICE2="" MARKETPRICE3="35.1" ADMITTEDQUOTE="" MP2VALTRD="0" MARKETPRICE3TRADESVALUE="515136" ADMITTEDVALUE="0" WAVAL="" />
+<row BOARDID="TQBR" TRADEDATE="2015-12-21" SHORTNAME="ЗМЗ-ап" SECID="ZMZNP" NUMTRADES="0" VALUE="0" OPEN="" LOW="" HIGH="" LEGALCLOSEPRICE="11.75" WAPRICE="" CLOSE="" VOLUME="0" MARKETPRICE2="" MARKETPRICE3="12.15" ADMITTEDQUOTE="" MP2VALTRD="0" MARKETPRICE3TRADESVALUE="500380" ADMITTEDVALUE="0" WAVAL="" />
+<row BOARDID="TQBR" TRADEDATE="2015-12-21" SHORTNAME="ЗВЕЗДА ао" SECID="ZVEZ" NUMTRADES="11" VALUE="326100" OPEN="1.5" LOW="1.31" HIGH="1.5" LEGALCLOSEPRICE="1.4" WAPRICE="1.42" CLOSE="1.4" VOLUME="230000" MARKETPRICE2="" MARKETPRICE3="1.44" ADMITTEDQUOTE="" MP2VALTRD="0" MARKETPRICE3TRADESVALUE="504500" ADMITTEDVALUE="0" WAVAL="" />
+</rows>
+</data>
+<data id="history.cursor">
+<metadata>
+<columns>
+<column name="INDEX" type="int64" />
+<column name="TOTAL" type="int64" />
+<column name="PAGESIZE" type="int64" />
+</columns>
+</metadata>
+<rows>
+<row INDEX="300" TOTAL="310" PAGESIZE="100" />
+</rows>
+</data>
+</document>
+]]></Data>
+</XData>
+</Class>
+</Export>
