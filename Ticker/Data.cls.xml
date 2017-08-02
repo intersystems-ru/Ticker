@@ -88,7 +88,7 @@
 <Property name="Average">
 <Description>
 Средневзвешенная цена акции http://www.moex.com/s1194
-Может считаться как за день так и не за день.</Description>
+Может считаться как за день так и не за период.</Description>
 <Type>%Decimal</Type>
 <Parameter name="XMLNAME" value="WAPRICE"/>
 <Parameter name="XMLPROJECTION" value="attribute"/>
