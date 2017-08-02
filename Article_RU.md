@@ -1,4 +1,4 @@
-# Визуализация данные Московской Биржи с помощью InterSystems DeepSee
+# Визуализация данных Московской Биржи с помощью InterSystems DeepSee
 
 ## Содержание
 
@@ -15,10 +15,13 @@
 
 
 ## Введение
+
+В стеке технологий InterSystems есть пакет бизнес-аналитики DeepSee. Он предназначен для создания OLAP-решений для баз данных на Caché и любых реляционных СУБД.  В статье рассматривается пример создания в OLAP-куба и работа со средством аналитики источников данных  и пользовательского интерфейса на примере анализа котировок акций торгуемых на Московской Бирже (ММВБ).
+
 ## Получение данных
 
-Для визуализации данных Московской Биржи их необходимо сначала загрузить. У Московской Биржи есть общедоступное [API](http://www.moex.com/a2193) которое предоставляет информацию о торговле акциями ф форматах HTML, XML, JSON, CSV.  
-Вот, к примеру, [данные](http://iss.moex.com/iss/history/engines/stock/markets/shares/boards/tqbr/securities.xml?date=2013-05-27) за 27 мая 2013 года. Создадим [XML-Enabled](http://docs.intersystems.com/latest/csp/docbook/DocBook.UI.Page.cls?KEY=GXML_import) класс в InterSystems Caché:
+Для визуализации данных о котировках акций торгуемых на бирже необходимо их сначала загрузить. У биржи есть общедоступное задокументированное [API](http://www.moex.com/a2193) которое предоставляет информацию о торговле акциями в форматах HTML, XML, JSON, CSV.  
+Вот, к примеру, [XML данные](http://iss.moex.com/iss/history/engines/stock/markets/shares/boards/tqbr/securities.xml?date=2013-05-27) за 27 мая 2013 года. Создадим [XML-Enabled](http://docs.intersystems.com/latest/csp/docbook/DocBook.UI.Page.cls?KEY=GXML_import) класс `Ticker.Data` в InterSystems Caché:
 
 ```
 Class Ticker.Data Extends (%Persistent, %XML.Adaptor)
@@ -64,14 +67,15 @@ Property Volume As %Integer(XMLNAME = "VOLUME", XMLPROJECTION = "attribute");
 }
 ```
 
-И загрузчик данных:
+И напишем загрузчик данных в формате XML. Так как класс у нас XML-Enabled то конвертация из XML в объекты происходит автоматически. Аналогичного поведения можно достичь для данных в форматах JSON (через [динамические объекты](http://docs.intersystems.com/latest/csp/docbook/DocBook.UI.Page.cls?KEY=GJSON_create)) и CSV (используя [%SQL.Util.Procedures](http://docs.intersystems.com/latest/csp/documatic/%25CSP.Documatic.cls?PAGE=CLASS&LIBRARY=%25SYS&CLASSNAME=%25SQL.Util.Procedures#METHOD_CSVTOCLASS)). Так как биржа отдаёт данные за определённую дату (день) то нам надо итерировать по дням и сохранять поступающие данные. Кроме того данные о котировках акций приходят страницами по 100 записей. Загрузчик может выглядеть так:
 ```
-/// Загрузить информацию о тикерах начиная с From и заканчивая To. Purge - удалить все записи перед началом загрузки
+/// Загрузить информацию об акциях начиная с From и заканчивая To. Purge - удалить все записи перед началом загрузки
 /// Формат From, To - YYYY-MM-DD
 /// Write $System.Status.GetErrorText(##class(Ticker.Loader).Populate())
 ClassMethod Populate(From As %Date(DISPLAY=3) = "2013-03-25", To As %Date(DISPLAY=3) = {$ZDate($Horolog,3)}, Purge As %Boolean = {$$$YES})
 {
 	#Dim Status As %Status = $$$OK
+	// Переводим даты во внутренний формат для простоты итерации
 	Set FromH = $ZDateH(From, 3)
 	Set ToH = $ZDateH(To, 3)
 	
@@ -118,7 +122,7 @@ ClassMethod PopulateDay(DateH As %Date) As %Status
 	Quit Status
 }
 
-/// Получить URL с информацией об акциях за дату Date, пропустить первые Start записей
+/// Получить URL с информацией о котировках акций за дату Date, пропустить первые Start записей
 ClassMethod GetURL(Date, Start As %Integer = 0) [ CodeMode = expression ]
 {
 $$$FormatText("http://iss.moex.com/iss/history/engines/stock/markets/shares/boards/tqbr/securities.xml?date=%1&start=%2", Date, Start)
@@ -131,6 +135,12 @@ $$$FormatText("http://iss.moex.com/iss/history/engines/stock/markets/shares/boar
 Весь код доступен в [репозитории](https://github.com/intersystems-ru/Ticker/).
 
 ## ETL
+
+Как известно, для построения любого OLAP-куба в любой BI-технологии в первую очередь необходимо сформировать [таблицу фактов](https://ru.wikipedia.org/wiki/Таблица_фактов): таблицу операций, записи которой требуется группировать и фильтровать. Таблица фактов может быть связана с другими таблицами по схеме [звезда](https://ru.wikipedia.org/wiki/Схема_звезды) или [снежинка](https://ru.wikipedia.org/wiki/Схема_снежинки).
+
+Таблица фактов для куба обычно является результатом работы аналитиков и разработчиков по процессу, который называется [ETL](https://ru.wikipedia.org/wiki/ETL) (extract, transform, load). Т.е. из данных предметной области делается “выжимка” необходимых для анализа данных, и переносится в удобную для хранилища структуру "звезда"/"снежинка": факты и справочники фактов. 
+В нашем случае этап ETL пропустим т.к. наш класс `Ticker.Data` уже находятся во вполне удобном для создания куба состоянии.
+
 ## Построение куба
 ## Построение сводной таблицы
 ## Построение дэшборда
