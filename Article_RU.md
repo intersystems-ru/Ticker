@@ -246,8 +246,13 @@ $$$FormatText("http://iss.moex.com/iss/history/engines/stock/markets/shares/boar
 Создадим виджет нажав на стрелку справа → Виджеты → "+" → Линейная диаграмма с маркерами. В качестве источника данных выберем TickersByYears:
 ![Widget](https://habrastorage.org/web/672/756/789/6727567890724f3bb65f58eb3a753d24.PNG)
 
-Однако читатель возразит - это же средняя температура по больнице. И будет прав. Добавим фильтрацию по 
+Однако читатель возразит - это же средняя температура по больнице. И будет прав. Добавим фильтрацию по компании. Для этого нажмём стрелку справа → Виджеты → Виджет 1 → Элементы управления → "+". Форма создания нового фильтра выглядит следующим образом:
+![Filter](https://habrastorage.org/web/fe8/559/69c/fe855969ca4e4f93bb5899527c2f1547.PNG)
 
+А вот так выглядит наш виджет с фильтром. Пользователь может изменить значение фильтра на любое другое.
+![Widget 2](https://habrastorage.org/web/2bb/ebe/f7e/2bbebef7e1714df996be80599da42005.PNG)
+
+После этого сохраним дэшборд.
 
 ## Установка MDX2JSON и DeepSeeWeb
 
@@ -274,7 +279,20 @@ $$$FormatText("http://iss.moex.com/iss/history/engines/stock/markets/shares/boar
 Для проверки установки  надо открыть в браузере страницу `http://server:port/dsw/index.html`. Должна открыться станица авторизации.
 
 ## Визуализация
+
+Откроем `http://server:port/dsw/index.html` и авторизуемся, также нужно указать область с кубом. Откроется список дэшбордов, в нашем случае есть только один созданный дэшборд. Откроем его:
+
+![DSW](https://habrastorage.org/web/025/ee0/f99/025ee0f9992d44a7aed6948d6b70079f.PNG)
+
+Поддерживается Drilldown:
+
+![DSW 2](https://habrastorage.org/web/8de/c01/fb0/8dec01fb0d7c49639043643256ad8821.PNG)
+
+
 ## Выводы
+
+DeepSee позволяет визуализировать имеющиеся у вас данные.
+
 ## Ссылки
 - [Документация](http://docs.intersystems.com/latest/csp/docbook/DocBook.UI.Page.cls?KEY=D2MODEL_ch_concepts)
 - [Репозиторий](https://github.com/intersystems-ru/Ticker).
