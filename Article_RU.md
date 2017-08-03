@@ -229,7 +229,12 @@ $$$FormatText("http://iss.moex.com/iss/history/engines/stock/markets/shares/boar
 
 ![Pivot 4](https://habrastorage.org/web/fee/ee8/f20/feeee8f20b4b40beb1404492a14f454b.PNG)
 
-Следующий этап - визуализация. Созраним полученную сводную таблицу под именем TickersByYears.
+
+На предыдущем этапе мы создали листинг - инструмент перехода от агрегированных данных к исходным фактам. Выберем любую строку сводной таблицы и нажмём кнопку ![Drillthrough](https://habrastorage.org/web/814/84b/ed0/81484bed028041ed828768093de4c131.PNG) для перехода к листингу:
+![Drillthrough 2](https://habrastorage.org/web/d1a/a45/2b6/d1aa452b69844a43a7272129697631fb.PNG)
+
+Следующий этап - визуализация. Перед сохранением упростим сводную таблицу и сохраним её под именем TickersByYears.
+![Pivot 5](https://habrastorage.org/web/dd6/9d1/3e6/dd69d13e6fd74bf985942cb535d75f01.PNG)
 
 ## Построение дэшборда (Dashboard)
 
@@ -238,8 +243,10 @@ $$$FormatText("http://iss.moex.com/iss/history/engines/stock/markets/shares/boar
 Создадим новый дэшборд нажав на стрелку справа → добавить → Добавить индикаторную панель
 ![Portal2](https://habrastorage.org/web/41c/186/875/41c186875ea14dbf8e782fc5d7877e8c.PNG)
 
-Создадим виджет нажав на стрелку справа → Виджеты → "+":
+Создадим виджет нажав на стрелку справа → Виджеты → "+" → Линейная диаграмма с маркерами. В качестве источника данных выберем TickersByYears:
+![Widget](https://habrastorage.org/web/672/756/789/6727567890724f3bb65f58eb3a753d24.PNG)
 
+Однако читатель возразит - это же средняя температура по больнице. И будет прав. Добавим фильтрацию по 
 
 
 ## Установка MDX2JSON и DeepSeeWeb
