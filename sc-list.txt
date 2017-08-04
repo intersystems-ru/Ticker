@@ -1,1 +1,3 @@
 Ticker.pkg
+TickersByYears.dashboard.dfi
+TickersByYears.pivot.dfi
