@@ -107,12 +107,14 @@ ClassMethod PopulateDay(DateH As %Date) As %Status
 		Set Status = Reader.OpenURL(..GetURL(Date, Count)) // Получаем следующую страницу данных
 		Quit:$$$ISERR(Status)
 		
-		// Десериализуем каждую ноду row в объект класса Ticker.Data
+		// Устанавливаем соответствие нода row == объект класса Ticker.Data 
 		Do Reader.Correlate("row", "Ticker.Data")
+		
+		// Десериализуем каждую ноду row в объект класса Ticker.Data
 		While Reader.Next(.Object, .Status) {
 			#Dim Object As Ticker.Data
 			
-			// Созраняем объект
+			// Сохраняем объект
 			If Object.Ticker '="" {
 				Set Status = Object.%Save()
 				Quit:$$$ISERR(Status)
