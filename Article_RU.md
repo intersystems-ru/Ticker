@@ -20,8 +20,8 @@
 
 ## Получение данных
 
-Для визуализации данных о котировках акций необходимо их сначала загрузить. У Московской Биржи есть публичное задокументированное [API](http://www.moex.com/a2193) которое предоставляет информацию о торговле акциями в форматах HTML, XML, JSON, CSV.  
-Вот, к примеру, [XML данные](http://iss.moex.com/iss/history/engines/stock/markets/shares/boards/tqbr/securities.xml?date=2013-05-27) за 27 мая 2013 года. Создадим [XML-Enabled](http://docs.intersystems.com/latest/csp/docbook/DocBook.UI.Page.cls?KEY=GXML_import) класс `Ticker.Data` в InterSystems Caché:
+Для визуализации данных о котировках акций необходимо их сначала загрузить. У Московской Биржи есть публичное задокументированное [API](http://www.moex.com/a2193), которое предоставляет информацию о торговле акциями в форматах HTML, XML, JSON, CSV.  
+Вот, к примеру, [XML данные](http://iss.moex.com/iss/history/engines/stock/markets/shares/boards/tqbr/securities.xml?date=2013-05-27) за 27 мая 2013 года. Создадим [XML-Enabled](http://docs.intersystems.com/latest/csp/docbook/DocBook.UI.Page.cls?KEY=GXML_import) класс `Ticker.Data` в платформе InterSystems:
 
 ```
 Class Ticker.Data Extends (%Persistent, %XML.Adaptor)
@@ -143,7 +143,7 @@ $$$FormatText("http://iss.moex.com/iss/history/engines/stock/markets/shares/boar
 
 ## Построение куба
 
-[DeepSee Architect](http://docs.intersystems.com/latest/csp/docbook/DocBook.UI.Page.cls?KEY=D2DT_ch_cube) - это WYSIWYG веб-приложение для создания OLAP куба. Для перехода к DeepSee Architect откроем Портал Управления Системой → DeepSee → Выбор области →  Architect. Открывается рабочее окно Архитектора.
+[DeepSee Architect](http://docs.intersystems.com/latest/csp/docbook/DocBook.UI.Page.cls?KEY=D2DT_ch_cube) - это WYSIWYG веб-приложение для создания OLAP-куба. Для перехода к DeepSee Architect откроем Портал Управления Системой → DeepSee → Выбор области →  Architect. Открывается рабочее окно Архитектора.
 
 Возможно нужно будет выбрать область, которая поддерживает DeepSee. В том случае если вы не видите вашей области в списке областей DeepSee перейдите в Портал Управления Системой → Меню → Управление веб-приложениями → /csp/область, и там в поле Включен поставьте галочку DeepSee и нажмите кнопку сохранить. После этого выбранная область должна появиться в списке областей DeepSee. 
 
@@ -151,7 +151,7 @@ $$$FormatText("http://iss.moex.com/iss/history/engines/stock/markets/shares/boar
 
 Нажав на кнопку "Создать" попадаем на экран создания нового куба, там необходимо установить следующие параметры:
 - Имя куба - название куба используемое в запросах к нему
-- Отображаемое Имя - локализуемое название куба (перевод осуществляется [стандартными механизмами](http://docs.intersystems.com/latest/csp/docbook/DocBook.UI.Page.cls?KEY=D2IMP_ch_localization) Caché)
+- Отображаемое Имя - локализуемое название куба (перевод осуществляется [стандартными механизмами](http://docs.intersystems.com/latest/csp/docbook/DocBook.UI.Page.cls?KEY=D2IMP_ch_localization) InterSystems)
 - Источник Cube - использовать таблицу фактов или другой куб в качестве источника данных
 - Исходный класс - если на предыдущем шаге был выбран класс, то указываем в качестве таблицы фактов класс Ticker.Data.
 - Имя класса для куба - имя класса, в котором будет храниться определение куба. Создаётся автоматически
@@ -211,7 +211,7 @@ $$$FormatText("http://iss.moex.com/iss/history/engines/stock/markets/shares/boar
 
 ## Построение сводной таблицы (Pivot)
 
-[DeepSee Analyzer](http://docs.intersystems.com/latest/csp/docbook/DocBook.UI.Page.cls?KEY=D2ANLY_ch_intro) предназначен для непосредственного анализа данных кубов и подготовки источников данных для дальнейшей визуализации. Для перехода к DeepSee Analyzer откроем Портал Управления Системой → DeepSee → Выбор области →  Analyzer. Открывается рабочее окно Аналайзера.
+[DeepSee Analyzer](http://docs.intersystems.com/latest/csp/docbook/DocBook.UI.Page.cls?KEY=D2ANLY_ch_intro) - визуальное средство для непосредственного анализа данных кубов и подготовки источников данных для дальнейшей визуализации. Для перехода к DeepSee Analyzer откроем Портал Управления Системой → DeepSee → Выбор области →  Analyzer. Открывается рабочее окно Аналайзера.
 ![Analyzer](https://habrastorage.org/web/ba5/c87/035/ba5c8703519e47eca0bbe27f49f19c72.PNG)
 В рабочем окне Аналайзера слева мы видим элементы созданного куба: показатели и измерения. Комбинируя их мы строим запросы к кубу на языке [MDX](http://docs.intersystems.com/latest/csp/docbook/DocBook.UI.Page.cls?KEY=D2GMDX_ch_intro#D2GMDX_intro_mdx) - аналоге языка SQL для многомерных OLAP кубов.
 Рассмотрим интерфейс Аналайзера. Справа - поле сводной таблицы. В поле сводной таблицы Аналайзера всегда показывается результат выполнения MDX-запроса. Посмотреть текущий MDX-запрос можно если нажать кнопку ![Source](https://habrastorage.org/web/29d/377/fed/29d377fed2d94b79a83c5287b4932a32.PNG). При первом открытии куба в поле сводной таблицы по умолчанию показывается  количество записей в таблице фактов - в нашем случае это количество записей в классе Ticker.Data. Этому соответствует MDX: `SELECT FROM [TICKER]`.
@@ -256,7 +256,7 @@ $$$FormatText("http://iss.moex.com/iss/history/engines/stock/markets/shares/boar
 
 ## Установка MDX2JSON и DeepSeeWeb
 
-Для визуализации созданного дашборда используются следующие OpenSource решения:
+Для визуализации созданного дашборда можно использовать следующие OpenSource решения:
 - [MDX2JSON](https://github.com/intersystems-ru/Cache-MDX2JSON) - REST API предоставляет информацию о кубах, пивотах, дашбордах и многих других элементах DeepSee в частности - результатах исполнения MDX запросов.
 - [DeepSeeWeb](https://github.com/intersystems-ru/DeepSeeWeb) - AngularJS приложение, предоставляющее альтернативную реализацию портала пользователя DeepSee. Может быть легко кастомизирован. Использует MDX2JSON в качестве бэкэнда. Вот пример дашборда визуализированного в DeepSeeWeb:
 
