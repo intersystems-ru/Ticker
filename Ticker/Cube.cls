@@ -1,18 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Export generator="Cache" version="25">
-<Class name="Ticker.Cube">
-<Description>
-</Description>
-<ProcedureBlock>1</ProcedureBlock>
-<Super>%DeepSee.CubeDefinition</Super>
-<TimeCreated>64498,47977.745412</TimeCreated>
-<DependsOn>Ticker.Data</DependsOn>
+/// 
+Class Ticker.Cube Extends %DeepSee.CubeDefinition [ DependsOn = Ticker.Data, ProcedureBlock ]
+{
 
-<XData name="Cube">
-<Description>
-Cube definition from Architect.</Description>
-<XMLNamespace>http://www.intersystems.com/deepsee</XMLNamespace>
-<Data><![CDATA[
+/// Cube definition from Architect.
+XData Cube [ XMLNamespace = "http://www.intersystems.com/deepsee" ]
+{
 <cube xmlns="http://www.intersystems.com/deepsee" name="Ticker" displayName="Ticker" disabled="false" abstract="false" sourceClass="Ticker.Data" countMeasureName="%COUNT" bucketSize="8" bitmapChunkInMemory="false" precompute="0" disableListingGroups="false">
   <dimension name="Ticker" displayName="Тикер" disabled="false" hasAll="false" allCaption="All Ticker" allDisplayName="Ticker" type="data" calendar="gregorian" iKnowType="entity" hidden="false" showHierarchies="default">
     <hierarchy name="H1" disabled="false" hidden="false">
@@ -40,9 +32,9 @@ Cube definition from Architect.</Description>
     <additionalDescription>undefined</additionalDescription>
   </listing>
 </cube>
-]]></Data>
-</XData>
+}
 
-<Parameter name="DOMAIN"/>
-</Class>
-</Export>
+Parameter DOMAIN;
+
+}
+
